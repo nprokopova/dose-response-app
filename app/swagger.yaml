@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: Dose Response API
+  version: 1.0.0
+  description: API for uploading dose response data and computing regression
+
+paths:
+
+  /upload:
+    post:
+      operationId: app.views.upload_csv
+      summary: Upload CSV and compute regression
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Fit result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FitResult'
+
+  /regress:
+    post:
+      operationId: app.views.regress
+      summary: Recalculate regression from list of points
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                points:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Point'
+      responses:
+        '200':
+          description: Fit result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FitResult'
+
+components:
+  schemas:
+    Point:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+
+    FitResult:
+      type: object
+      properties:
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+        slope:
+          type: number
+        intercept:
+          type: number
